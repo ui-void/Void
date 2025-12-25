@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ui.void | Liquid Void</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body data-theme="dark">
+    <div class="scanlines"></div>
+    <div class="noise"></div>
+    <canvas id="starfield"></canvas>
+    <canvas id="trail-canvas"></canvas>
+    <canvas id="transition-canvas"></canvas>
+    <div id="tooltip"></div>
+
+    <button class="theme-toggle hover-trigger" onclick="toggleTheme()" data-tooltip="Switch Theme" aria-label="Toggle theme">
+        <i class="ph-fill ph-moon-stars" id="themeIcon"></i>
+    </button>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <div id="overlay" onclick="enterSite()">
+        <div class="enter-text">[ Enter if you Dare ]</div>
+    </div>
+
+    <!-- === NAVIGATION BAR === -->
+    <nav class="navbar" id="navbar">
+        <div class="navbar-content">
+            <button class="nav-item" onclick="scrollToHome()">Home</button>
+            <button class="nav-item" onclick="scrollToPricing()">Pricing</button>
+            <button class="nav-item" onclick="openTermsOfService()">Terms of Service</button>
+            <button class="nav-item" onclick="scrollToContact()">Contact</button>
+        </div>
+    </nav>
+
+    <!-- === TERMS OF SERVICE MODAL === -->
+    <div id="tosOverlay" class="tos-overlay" onclick="closeTermsOfService()"></div>
+    <div id="tosModal" class="tos-modal">
+        <div class="tos-header">
+            <h2 class="tos-title">Terms of Service</h2>
+            <p class="tos-subtitle">UI.Void's Design Services</p>
+            <button class="tos-close" onclick="closeTermsOfService()" data-tooltip="Close">
+                <i class="ph-bold ph-x"></i>
+            </button>
+        </div>
+        <div class="tos-content">
+            <section class="tos-section">
+                <h3>1. Agreement to Terms</h3>
+                <p>By engaging ui.void's design services, you agree to these terms and conditions. These terms govern the relationship between the client and ui.void for all design projects.</p>
+            </section>
+
+            <section class="tos-section">
+                <h3>2. Services Description</h3>
+                <p>ui.void provides professional UI/UX design services including:</p>
+                <ul>
+                    <li>User interface design and development</li>
+                    <li>User experience optimization</li>
+                    <li>Visual design and branding</li>
+                    <li>Interactive prototypes and animations</li>
+                    <li>Design consultation and strategy</li>
+                </ul>
+            </section>
+
+            <section class="tos-section">
+                <h3>3. Project Timeline & Delivery</h3>
+                <p>The project timeline varies by tier selection:</p>
+                <ul>
+                    <li><strong>Starter Tier:</strong> 10-12 business days</li>
+                    <li><strong>Hero Tier:</strong> 2 weeks</li>
+                    <li><strong>Warrior Tier:</strong> 3 weeks</li>
+                    <li><strong>Konquer Tier:</strong> 2 months</li>
+                </ul>
+                <p>Timelines begin upon project initiation and deposit receipt. Extensions may apply due to delayed feedback or scope changes. These are estimations and may vary based on project complexity and client responsiveness.</p>
+            </section>
+
+            <section class="tos-section">
+                <h3>4. Revisions & Modifications</h3>
+                <p>The number of revision rounds included varies by package tier. Additional revisions beyond the included amount will be billed at the standard revision rate. Major scope changes constitute a new project.</p>
+            </section>
+
+            <section class="tos-section">
+                <h3>5. Payment Terms</h3>
+                <p>A 50% deposit is required to initiate the project. The remaining balance is due upon project completion. Payment methods include bank transfer, Crypto, and other agreed-upon methods. Late payments may result in project suspension.</p>
+            </section>
+
+            <section class="tos-section">
+                <h3>6. Intellectual Property</h3>
+                <p>Upon final payment, all design files, concepts, and deliverables become the property of the client. ui.void retains the right to display completed work in portfolio and case studies with client permission.</p>
+            </section>
+
+            <section class="tos-section">
+                <h3>7. Communication & Updates</h3>
+                <p>Project communication occurs via Discord, Email, and X (Twitter). Regular progress updates and meetings are scheduled according to the selected tier.</p>
+            </section>
+
+            <section class="tos-section">
+                <h3>8. Cancellation & Refunds</h3>
+                <p>Refunds are only available for projects that are 20% complete and below. Projects above the 20% completion rate are NOT eligible for Refunds.</p>
+            </section>
+
+            <section class="tos-section">
+                <h3>9. Limitation of Liability</h3>
+                <p>ui.void is not liable for indirect, incidental, or consequential damages arising from the design services. Liability is limited to the amount paid for services.</p>
+            </section>
+
+            <section class="tos-section">
+                <h3>10. Confidentiality</h3>
+                <p>All project details and client information remain confidential. ui.void will not disclose project information without explicit written consent from the client.</p>
+            </section>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop crossorigin="anonymous">
+        <source src="Justice – Neverender (Starring Tame Impala) (Official Video) - www.youtube.com-[134kbps]-(www.KeepVid.to).mp3" type="audio/mpeg">
+        <!-- Fallback if local file not found -->
+        <source src="https://cdn.pixabay.com/audio/2022/10/25/audio_2d81552097.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="card-container" id="mainContainer">
+        <div class="card" id="tiltCard">
+            <a href="https://discord.com/users/1057313052363599893" target="_blank" rel="noopener noreferrer" class="discord-icon hover-trigger" data-tooltip="Contact ui.void on Discord" aria-label="Discord">
+                <i class="ph-fill ph-discord-logo"></i>
+            </a>
+            <div class="header parallax-item">
+                <div class="pfp-container hover-trigger" data-tooltip="Verified User" id="pfpClick">
+                    <div class="pfp"></div>
+                    <div class="status-dot"></div>
+                </div>
+                <div class="user-info">
+                    <h1 class="hover-trigger" onmouseover="hackerEffect(this)" data-value="ui.void" data-tooltip="Identity">ui.void</h1>
+                    <div class="tag-line hover-trigger" onclick="copyDiscord()" data-tooltip="Click to Copy ID">
+                        <span>@ui.void</span>
+                        <span class="copy-hint" id="copyHint"><i class="ph ph-copy"></i></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bio parallax-item">
+                <span id="typewriter"></span><span class="cursor-blink">|</span>
+            </div>
+
+            <div class="links parallax-item">
+                <a href="https://github.com/ui-void" target="_blank" rel="noopener noreferrer" class="link-btn hover-trigger" data-tooltip="Open GitHub">
+                    <div class="link-left">
+                        <i class="ph-fill ph-github-logo"></i>
+                        <span>GitHub</span>
+                    </div>
+                    <i class="ph-bold ph-arrow-right link-arrow"></i>
+                </a>
+                <a href="https://uivoid.artstation.com/projects/RK589A" target="_blank" rel="noopener noreferrer" class="link-btn hover-trigger" data-tooltip="Open ArtStation">
+                    <div class="link-left">
+                        <img src="artstation.png" alt="ArtStation" class="artstation-logo">
+                        <span>ArtStation</span>
+                    </div>
+                    <i class="ph-bold ph-arrow-right link-arrow"></i>
+                </a>
+            </div>
+
+            <div class="music-player hover-trigger parallax-item" 
+                 data-tooltip="Now Playing: Neverender by Justice" 
+                 role="button" 
+                 tabindex="0" 
+                 aria-label="Toggle music playback">
+                <i class="ph-fill ph-play-circle"></i>
+                <div class="track-info">
+                    <span class="track-title">Neverender</span>
+                    <span class="track-artist">Justice</span>
+                </div>
+                <div class="equalizer">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </div>
+            <div class="view-counter parallax-item">
+                <i class="ph ph-eye"></i>
+                <span id="viewCount">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- === PRICING SECTION === -->
+    <div class="pricing-section">
+        <div class="pricing-header">
+            <span class="pricing-badge">Tiers</span>
+            <h2 class="pricing-title">A tier for everyone</h2>
+            <p class="pricing-description">Choose the tier that suits your purpose</p>
+        </div>
+
+        <div class="tier-selector">
+            <button class="tier-tab active" data-tier="starter">Starter</button>
+            <button class="tier-tab" data-tier="hero">Hero</button>
+            <button class="tier-tab" data-tier="premium">Warrior</button>
+            <button class="tier-tab" data-tier="professional">Konquer</button>
+        </div>
+
+        <div class="pricing-cards-container">
+            <div class="pricing-card" id="pricingCardContent">
+                <div class="card-header">
+                    <h3 class="card-title">Starter UI Package</h3>
+                    <p class="card-subtitle">UI/UX</p>
+                </div>
+                <div class="card-content">
+                    <ul class="features-list">
+                        <li><i class="ph ph-check"></i> Advanced animations, premium effects</li>
+                        <li><i class="ph ph-check"></i> 1 week & a half turn around</li>
+                        <li><i class="ph ph-check"></i> 1 revision</li>
+                        <li><i class="ph ph-check"></i> Project updates via Discord, X, & Email</li>
+                        <li><i class="ph ph-check"></i> Basic Project Management Support</li>
+                        <li><i class="ph ph-check"></i> Weekly Progress meetings</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <div class="price">
+                        <span class="price-amount">$600</span>
+                        <span class="price-period">/ project</span>
+                    </div>
+                    <button class="book-btn hover-trigger" data-tooltip="Lock in your Price">Lock in your Price</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
